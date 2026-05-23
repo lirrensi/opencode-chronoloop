@@ -1,6 +1,6 @@
-# opencode-chonoloop 🌀🌌🌠🎆
+# opencode-chronoloop 🌀🌌🌠🎆
 
-[![npm version](https://img.shields.io/npm/v/opencode-chonoloop?color=6b48ff)](https://www.npmjs.com/package/opencode-chonoloop)
+[![npm version](https://img.shields.io/npm/v/opencode-chronoloop?color=6b48ff)](https://www.npmjs.com/package/opencode-chronoloop)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Endless autonomous loop for OpenCode.** 🔄🌟✨🪐🌙
@@ -124,7 +124,7 @@ Ephemeral — all state lives in memory. If OpenCode restarts, the loop is gone.
 // opencode.jsonc
 {
   "plugin": [
-    "opencode-chonoloop",
+    "opencode-chronoloop",
   ]
 }
 ```

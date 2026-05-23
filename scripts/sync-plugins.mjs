@@ -2,7 +2,7 @@
 /**
  * sync-plugins.mjs
  *
- * Writes the opencode-chonoloop plugin re-export file into
+ * Writes the opencode-chronoloop plugin re-export file into
  * `.opencode/plugins/` so OpenCode picks it up locally.
  *
  * The re-export file just points back to the project source,
@@ -17,10 +17,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, "..")
 
 const PLUGIN_DIR = resolve(root, ".opencode", "plugins")
-const PLUGIN_FILE = resolve(PLUGIN_DIR, "opencode-chonoloop.ts")
+const PLUGIN_FILE = resolve(PLUGIN_DIR, "opencode-chronoloop.ts")
 
 const RE_EXPORT_CONTENT = `/**
- * opencode-chonoloop — endless autonomous loop plugin
+ * opencode-chronoloop — endless autonomous loop plugin
  *
  * OpenCode auto-loads .ts files from its plugins directory.
  * This file re-exports the plugin from the project source.

@@ -1,9 +1,20 @@
 # Changelog
 
-All notable changes to **opencode-chonoloop** are documented here.
+All notable changes to **opencode-chronoloop** are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [0.2.1] — 2026-05-23
+
+### Fixed
+
+- **Package name corrected** — `opencode-chonoloop` → `opencode-chronoloop`
+  (missing 'r' in "chrono"). The old `opencode-chonoloop` package on npm has
+  been deprecated — please update your config to reference
+  `opencode-chronoloop` instead.
 
 ---
 
@@ -51,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plan-mode safe-skip (no infinite planning loops).
 - No tool exposed to agent — pure time-based exit, hidden from agent.
 
+[0.2.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/lirrensi/opencode-chronoloop/releases/tag/v0.1.0
