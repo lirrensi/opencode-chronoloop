@@ -39,6 +39,80 @@ ChronoLoop is for all of that. The exit condition is **purely time-based**, and 
 
 ---
 
+## The Paradigm 🧠💎🔄🌟⚡
+
+ChronoLoop isn't just a plugin — it's a **meta-control pattern** for autonomous agents. Traditional loops are *task-oriented*: define a goal, run tools, check completion. ChronoLoop is *time-oriented*: define a work rhythm, keep going, stop when the bell rings.
+
+This flips the mental model:
+
+| Dimension | Task-Oriented (Goal / Ralph) | Time-Oriented (ChronoLoop) |
+|---|---|---|
+| Success | Goal achieved ✅ | Maximum value extracted from time budget ⏱️ |
+| Agent's view | "I need to finish X" | "I need to keep working on this project" |
+| Exit condition | Agent declares done | Server enforces time limit |
+| Gaming risk | Agent can shortcut to completion | Agent can't shortcut what it can't see |
+| Work discovery | Defined upfront | Dynamic — agent finds or creates work |
+| Best for | Finite, scoped deliverables | Open-ended refinement, automation, exploration |
+| You manage | Requirements & acceptance criteria | Principles & work patterns |
+
+The real shift: **you stop telling the agent WHAT to achieve and start telling it HOW to work.** The output isn't a completed task — it's whatever the agent produced in the time available. This is closer to managing a talented human contributor than running a program. You give them principles, a source of work, and let them run until you check in.
+
+> 🎯 **ChronoLoop turns OpenCode from a chat interface into an autonomous work scheduler.** You're not asking questions anymore — you're deploying attention.
+
+### What this means in practice 🤔💡
+
+- **You become a manager, not a prompter.** Your job shifts from crafting the perfect ask to designing a good work environment — scratchpad files, constitution documents, feedback loops via backtick commands.
+- **The agent becomes a contributor, not a tool.** It discovers work, prioritizes, executes, reflects, and adapts. Just like a human would.
+- **Time becomes the budget, not tasks.** You allocate 30 minutes of attention, not "fix these 5 bugs." The agent self-organizes around the time.
+- **Failure becomes cheaper.** A 15-minute loop that goes nowhere costs 15 minutes. A 6-hour loop with bad directives costs 6 hours. Start small, iterate the setup.
+
+---
+
+## You bring your own everything 🎒💭🧠📝🔧
+
+Here's the truth, love: **ChronoLoop does one thing.** It fires a continuation message when the session goes idle — and keeps doing that until time runs out. That's it. No built-in memory. No error recovery. No task management. No "oops you got compacted" safety net.
+
+```
+┌─────────────────────────────────────────────────┐
+│                  ChronoLoop                      │
+│                                                  │
+│  session.idle → timer check → fire message      │
+│  session.idle → timer check → fire message      │
+│  session.idle → timer check → STOP              │
+│                                                  │
+│  That's the whole plugin. Everything else is YOU │
+└─────────────────────────────────────────────────┘
+```
+
+What ChronoLoop does **not** do:
+
+| Not handled | What it means for you |
+|---|---|
+| 🧠 Memory / persistence | The agent won't remember what it did last loop. **You** need a scratchpad file, a task list, or a status tracker the agent reads and writes. |
+| 🔄 Recovery from amnesia | Chat gets compacted? Session restarts? **You** need a file-based source of truth that survives context clearing. |
+| 🚑 Error recovery | Agent hits a compile error and spirals? **You** need fallback instructions, time-boxed retries, and escalation documents. |
+| 📋 Task management | Work runs out and the agent starts spinning? **You** need layered focus directives and scouting instructions. |
+| 🧭 Navigation | Agent doesn't know what to do next? **You** need a constitution, priority list, or discovery mechanism. |
+| 🔔 Monitoring | Loop runs while you're away? **You** need the heartbeat toast and maybe your own logging. |
+
+> 🧠 **Gold rule:** *"The agent itself is amnesiac, but the filesystem isn't."* Every long-running agent practitioner learns this eventually. The conversation is a river — it flows, compacts, and forgets. The filesystem is a vault. Design for the vault.
+
+### This is not a bug. This is the deal. 🎯
+
+The reason ChronoLoop doesn't provide these things is the same reason it's powerful: **only you know what "good work" looks like for your project.**
+
+- A codebase needs refactoring, testing, and docs in different proportions
+- A research project needs exploration, summarization, and cross-referencing
+- A creative project needs iteration, experimentation, and curation
+
+No plugin can know which one you're doing or what "progress" means in your context. ChronoLoop gives you the *beat* — you bring the *music*.
+
+> 💡 **The corollary:** The quality of your loop's output is directly proportional to the quality of your **prompt design + scratchpad design + fallback plan.** Not to the plugin version. The plugin is a dumb timer with good posture. You're the brains.
+
+**So yes — you bring your own prompt. You bring your own scratchpad. You bring your own constitution. You bring your own escalation plan.** ChronoLoop just keeps the chair warm until you get back. 🪑💨
+
+---
+
 ## Commands 🚀🎉🎮🕹️🎯
 
 ### `/cronoloop <minutes> [message]` 🎬🎥🎞️📽️
@@ -106,6 +180,79 @@ It just sees "continue working" and keeps going. This prevents shortcut behavior
 
 ---
 
+## Architecture 🔮🧬⚙️🎛️🔧
+
+How does ChronoLoop stay invisible to the agent? It operates at the **TUI layer** — the text interface you type into — not the tool layer, not the agent loop, not the context window. It puppeteers the prompt box.
+
+```
+                  ┌──────────────────────────────────────────┐
+                  │            OpenCode TUI                  │
+                  │                                          │
+                  │  ┌──────────────────────────────────┐    │
+                  │  │  You: /cronoloop 60               │    │
+                  │  │  Agent: *works on your project*   │    │
+                  │  │  ── session.idle fires ────────── │    │
+                  │  │  ChronoLoop: *types message*      │    │
+                  │  │  ChronoLoop: *presses Enter*      │    │
+                  │  │  Agent: *works again*             │    │
+                  │  │  ── session.idle fires ────────── │    │
+                  │  │  ChronoLoop: *checks timer*       │    │
+                  │  │  Agent: *works some more*         │    │
+                  │  └──────────────────────────────────┘    │
+                  └──────────────────────────────────────────┘
+```
+
+Key architectural decisions that make this possible:
+
+### 🎭 TUI puppeteering
+The plugin never injects a tool, hooks into the agent's reasoning loop, or modifies context. It calls three simple TUI methods — `clearPrompt()`, `appendPrompt()`, and `submitPrompt()` — exactly as if a human typed the message and pressed Enter. The agent has **no way to detect it's being looped** because from its perspective, it's just a user who keeps sending messages.
+
+### ⚡ Event-driven, not polled
+The loop is driven by the `session.idle` event, which fires exactly once when the agent finishes a complete turn (not between internal tool calls). No `setInterval` checking "is it done yet?" — just a clean, reactive chain:
+```
+session.idle → timer check → still time? → fire continuation → wait → session.idle → ...
+```
+
+### 🪪 Session-scoped state
+State lives in a `Map<sessionID, ChronoLoopState>` — each conversation gets its own independent loop. Start a 2-hour refactoring loop in Session A and a 30-minute testing loop in Session B. They coexist without interference.
+
+### 🛡️ In-flight safety
+A tracking set prevents double-firing. If `session.idle` fires while a continuation is already in flight (e.g., the agent finishes mid-loop), the event is silently ignored. No duplicated messages, no cascading loops.
+
+### 🚫 Abort-aware
+If you hit Escape during a loop, the `MessageAbortedError` event is detected, the loop is torn down, and a toast confirms it stopped. The plugin doesn't fight you — one interrupt and it's done.
+
+### 💾 Zero disk I/O
+All state is ephemeral — memory only. Restart OpenCode and every loop is gone. No stale state files, no cleanup scripts, no "oh no, it persisted a half-finished loop from last week."
+
+### 🔌 Model-agnostic
+Because ChronoLoop never enters the agent's world — it only touches the existing TUI — it works with **any model, any provider, any plugin stack**. If OpenCode can run it, ChronoLoop can loop it.
+
+### ⚠️ Long-lived session — not short-lived iterations
+
+This is the most important architectural distinction between ChronoLoop and patterns like RalphLoop:
+
+| | RalphLoop | ChronoLoop |
+|---|---|---|
+| **Session model** | Fresh session per iteration | **One long-lived session**, compacted over and over |
+| **Agent lifetime** | Agent dies after each turn | Agent lives across the entire loop duration |
+| **Context resets** | Every iteration is a clean slate | Context grows until compaction, then trims in-place |
+| **"Session boundaries are a feature"** | ✅ Yes — each run is independent | ⚠️ Partially — the same session persists |
+
+**What this means for you:**
+
+- **Context accumulates.** Each continuation adds to the same conversation. Compaction clears history eventually, but until then the agent carries everything forward. Your agent needs to be *context-aware* — don't let it generate enormous self-reports or bloated task lists that inflate every turn.
+
+- **Don't ask the agent to spawn sub-agents within the session.** Telling the agent to "create a sub-agent to handle testing" sounds clever but bloats the context with nested tool calls, internal monologue, and half-finished sub-tasks. Instead, use the **session strategy** (Best Practice #7) — separate loops in separate sessions communicate through files.
+
+- **Shorter loops = more compaction.** A 15-minute loop compacts more frequently than an 8-hour one. If you're seeing context bloat degrade the agent's performance, try reducing the duration. Each new `/cronoloop` call starts a fresh session, so breaking work into shorter sequential loops gives the agent a cleaner slate more often.
+
+- **The scratchpad is essential.** Because the session stays alive, the agent might *think* it remembers something from 40 turns ago (when compaction hasn't cleared it yet). But it can't *rely* on that memory — compaction could wipe it at any moment. The scratchpad file (or backtick-injected state) is the only reliable source of truth.
+
+> 💡 **Key takeaway:** RalphLoop solves session boundaries by killing the agent. ChronoLoop solves session continuity by keeping the agent alive and relying on files for durable memory. Same destination, different mechanism — design your prompt for the latter.
+
+---
+
 ## Heartbeat 💓💖💗🫀🩺
 
 While the loop is active, a toast notification shows remaining time every 30 seconds so you always know it's alive and working.
@@ -163,6 +310,16 @@ If you're using a **fast API model** (GPT-4o, Claude, etc.), continuations take 
 
 For fast models, start small (15–30 minutes), observe the quality, and scale up. A fast model in a 6-hour loop can generate hundreds of messages — make sure your context window and budget can handle it.
 
+**Plan first, loop later.** Before you commit to a 6-hour run, spend the first 10–15 minutes on a short **planning loop**:
+
+```
+/cronoloop 15 "Explore the codebase. Identify the top 5 areas that need work.
+               Write them to PLAN.md with priority order and estimated effort.
+               Do NOT make any changes — just plan."
+```
+
+Review `PLAN.md`, refine it, *then* start the real loop. This separates the "figure out what to do" phase from the "do it" phase — two different cognitive loads that shouldn't share a session. The planning loop also acts as a cheap HITL checkpoint: if the plan is nonsense, you just spent 15 minutes instead of 6 hours learning that.
+
 ### 2. Give the agent a way to pick up where it left off 📝📌🔄📍🗺️
 
 ChronoLoop fires the same message every time. If the agent has no memory of what it was doing, it will restart from scratch — or worse, repeat the same work.
@@ -218,6 +375,27 @@ The agent should know how to *scout* for work, not just execute a fixed list:
 - "Look for untested code paths, missing error handling, unvalidated inputs"
 
 Structure your message so the agent has both a **task source** (where to find work) and an **escalation path** (what to do when that source is empty).
+
+**Self-verification — who watches the watcher?** 🔍👀
+
+If you're running truly open-ended experiments (not just task execution), the agent can't be the sole judge of its own work. LLMs consistently overpraise their own output — asking the same agent that wrote code to evaluate it is grading your own homework.
+
+You have two strategies:
+
+1. **Objective gates (simpler, recommended):** Don't ask the agent "is this good?" — let the environment answer. Embed test results, linter output, type checks, and diff stats via backtick commands. The agent doesn't need to *judge* quality — it needs to *react* to objective signals: "4 tests failed, fix them."
+
+2. **A separate evaluator session (more thorough):** Use the session strategy (BP#7) to run a dedicated review loop that reads the main loop's outputs and assesses them. The evaluator comes with fresh context, untainted by the work that produced the output, and can be more skeptical.
+
+The evaluator doesn't need to be a different model — just a different session with a different prompt that emphasizes skepticism:
+
+```
+Session A (doer):  /cronoloop 60 "Implement the feature. Write tests."
+Session B (judge): /cronoloop 15 "Review the output from Session A's scratchpad.
+                    Look for edge cases, regressions, and quality gaps.
+                    Be harsh. File issues in REVIEW.md."
+```
+
+> ⚡ **The one-sentence rule:** If you can't describe the output quality with an automated check (test pass, lint clean, type-check ok), you need a human or a dedicated evaluator in the loop. Don't trust the doer to grade its own homework.
 
 ### 4. Separate constitution from continuation 📜🔄📖🗣️🏛️
 
@@ -277,6 +455,67 @@ Read CHRONO_CONTEXT.md and continue.
 - If all tasks are exhausted, run a fresh audit and define the next improvement cycle
 - If you hit a catastrophic blocker, compact everything into BLOCKERS.md and wait
 ```
+
+### 6. Embrace the self-referential loop 🔮🪞🔄📡🧠
+
+The backtick feature (introduced in v0.2.0) isn't just a convenience — it's the closest thing to giving your agent **real-time situational awareness**. Each loop iteration can inject fresh data about the system's state directly into the agent's prompt, creating a feedback loop where the agent sees its own impact and adapts.
+
+Think of backtick commands as **sensory organs** for your agent:
+
+| Sensor | Command | What the agent learns |
+|---|---|---|
+| 👁️ Visual | `` `git log --oneline -5` `` | What just happened — recent commits, who did what |
+| 🦻 Auditory | `` `pnpm test 2>&1 | tail -15` `` | Is the build green? Which tests failed? |
+| 🧠 Proprioception | `` `cat CHRONO_CONTEXT.md` `` | What was I working on? What's the current state? |
+| 🕐 Temporal | `` `date /t` `` | What time is it? (useful for time-aware scheduling) |
+| 🔍 Scout | `` `rg TODO src/ | head -20` `` | Where is work waiting? Discover tasks dynamically |
+
+**The self-referential pattern in action:**
+
+```
+# The message reads the scratchpad, checks progress, and feeds it all back
+/cronoloop 60 "Read `cat CHRONO_CONTEXT.md`. 
+  Check recent work: `git log --oneline -3 --format='- %s'`.
+  Run tests: `pnpm test 2>&1 | tail -5`.
+  Continue from where you left off. Update CHRONO_CONTEXT.md when done."
+```
+
+This creates a loop where the agent:
+1. Writes progress to `CHRONO_CONTEXT.md` during work
+2. The next loop iteration reads that file back via `` `cat CHRONO_CONTEXT.md` ``
+3. The agent sees its own history without relying on chat compaction
+
+**This effectively gives your agent persistent memory across loop iterations** — no chat history required. The scratchpad file becomes a primitive hippocampus, surviving context limits, session restarts, and model swaps.
+
+> ⚡ **Power tip:** Combine backtick sensors with the constitution pattern. Have the backtick section check whether the constitution is being followed and surface deviations. The agent becomes self-correcting.
+
+### 7. Use the session strategy for multi-loop orchestration 🎪🎭🎬🎯🎻
+
+Since loops are scoped per-session (each conversation gets its own independent loop), you can run multiple specialized loops **concurrently** in different sessions:
+
+```
+Session A:  /cronoloop 60  "Refactor the codebase. Focus on code quality."
+Session B:  /cronoloop 60  "Write and fix tests. Run pnpm test after each change."
+Session C:  /cronoloop 30  "Review docs. Fix any outdated documentation."
+Session D:  /cronoloop 120 "Background: check deps, update packages, audit security."
+```
+
+Each session has its own:
+- **Continuation message** — different instructions, different focus
+- **Timer** — different durations, independent start/stop
+- **Scratchpad** — separate state, no cross-contamination
+- **Model / agent config** — use a cheaper model for docs, a smarter one for refactoring
+
+**When to orchestrate multiple loops:**
+
+- **Parallel coverage** — refactoring, testing, and docs happening simultaneously instead of sequentially
+- **Skill specialization** — assign different agents (or different models) to different kinds of work
+- **Watchdog pattern** — one loop does the work, another loop monitors for regressions
+- **Staggered starts** — start a long refactoring loop, then 15 minutes later start a short testing loop to check nothing broke
+
+**Watch your budget.** Each loop generates a full conversation. If you're paying per-token, three concurrent loops cost three times as much. For local models, make sure your hardware can handle the load.
+
+> 🎯 **Pro tip:** Use staggered durations so they don't all expire at once. Start a 60m loop, then a 45m loop, then a 30m loop. They finish at different times, giving you staggered check-in points to review progress across all sessions.
 
 ---
 
