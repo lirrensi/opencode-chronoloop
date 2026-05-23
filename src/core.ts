@@ -3,6 +3,8 @@
 //  No completion criteria, no tool, pure time
 // ──────────────────────────────────────────────
 
+import { execSync } from "child_process"
+
 export const DEFAULT_MESSAGE =
   "We are running in an autonomous loop. Continue working. Make progress, improve things. Do not stop — there is always more to do."
 
@@ -113,4 +115,43 @@ export function formatLoopSummary(state: ChronoLoopState): string {
     `Remaining: ${formatDuration(remaining)}`,
     `Message: ${state.message.length > 60 ? state.message.slice(0, 60) + "…" : state.message}`,
   ].join("\n")
+}
+
+/** Maximum output length for a single backtick command result. */
+export const MAX_BACKTICK_OUTPUT_LENGTH = 2_000
+
+/**
+ * Find all backtick-enclosed commands in a message, execute each one via
+ * the system shell, and replace the backtick segment with the command's
+ * stdout output.
+ *
+ * Behaves like PHP backticks: `` `cmd` `` is replaced inline with the result.
+ *
+ * Backtick segments are processed left-to-right. If a command fails, the
+ * error message is inserted in place of the output. Empty backticks are
+ * silently removed.
+ */
+export function evaluateBackticks(message: string): string {
+  return message.replace(/`([^`]+)`/g, (_match, rawCommand: string) => {
+    const cmd = rawCommand.trim()
+    if (!cmd) return ""
+
+    try {
+      const stdout = execSync(cmd, {
+        encoding: "utf-8",
+        timeout: 30_000,
+        windowsHide: true,
+        stdio: ["pipe", "pipe", "pipe"], // capture stderr too, don't leak to console
+      })
+      const output = stdout.trim()
+      if (!output) return "(no output)"
+      if (output.length > MAX_BACKTICK_OUTPUT_LENGTH) {
+        return output.slice(0, MAX_BACKTICK_OUTPUT_LENGTH) + `\n… [truncated, ${output.length} total chars]`
+      }
+      return output
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      return `(error: ${msg.split("\n")[0]!.trim()})`
+    }
+  })
 }

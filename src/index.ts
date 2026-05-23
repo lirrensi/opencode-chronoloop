@@ -17,6 +17,7 @@ import {
   formatRemaining,
   formatDuration,
   formatLoopSummary,
+  evaluateBackticks,
 } from "./core"
 
 const HANDLED = "__CHRONOLOOP_HANDLED__"
@@ -89,16 +90,22 @@ export const ChronoLoopPlugin: Plugin = async ({ client, directory, worktree }) 
    * Simulates a real user typing into the TUI prompt box and pressing Enter.
    * This preserves all routing context (agent, model, etc.) because it flows
    * through the exact same path as a human-typed message.
+   *
+   * Before sending, any backtick-enclosed commands (`` `cmd` ``) in the message
+   * are evaluated and replaced with their shell output — like PHP backticks.
    */
   const fireContinuation = async (sessionID: string, state: ChronoLoopState) => {
     if (inFlight.has(sessionID)) return
     inFlight.add(sessionID)
 
     try {
+      // 0. Evaluate backtick commands in the message
+      const processedMessage = evaluateBackticks(state.message)
+
       // 1. Clear any existing text in the prompt box
       await client.tui.clearPrompt()
-      // 2. Type the loop message into the prompt box
-      await client.tui.appendPrompt({ body: { text: state.message } })
+      // 2. Type the processed message into the prompt box
+      await client.tui.appendPrompt({ body: { text: processedMessage } })
       // 3. Press Enter — routes exactly like a human-typed message
       await client.tui.submitPrompt()
     } catch (error) {

@@ -1,6 +1,6 @@
 {
   "name": "opencode-chonoloop",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "description": "Endless autonomous loop for OpenCode — time-based, no completion criteria",
   "main": "./src/index.ts",

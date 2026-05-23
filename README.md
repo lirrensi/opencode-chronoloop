@@ -64,6 +64,36 @@ Stop the loop immediately.
 
 ---
 
+### Backtick commands in loop messages 🐚⚡💬
+
+Your loop message (or the default) can now include backtick-enclosed shell
+commands that are executed locally before the message is sent. This lets the
+agent embed live data into its own continuation prompt — like a real-time
+status report.
+
+**Syntax:** embed `` `command` `` anywhere in your message. The command's
+stdout replaces the backtick segment inline.
+
+```
+/cronoloop 120 "Check `git log --oneline -3` then continue working"
+/cronoloop 30 "`pnpm test --reporter=dot 2>&1 | tail -5` — fix any failures"
+/cronoloop 60 "Read CHRONO_CONTEXT.md. Current time: `date /t`"
+```
+
+**Safety & limits:**
+
+- Output is capped at 2,000 characters per command
+- Commands failing? An `(error: ...)` placeholder is inserted instead
+- Empty backticks (`` ``` ``) are silently removed
+- 30-second timeout per command prevents runaway processes
+- Everything runs on your local machine — same as typing in your terminal
+
+This turns ChronoLoop from a simple "keep going" timer into a reactive
+automation tool that can check its own status, react to build results,
+adapt to changing conditions, and bring fresh context each loop.
+
+---
+
 ## What the agent sees 👁️💎👀🧠🔮
 
 Your message (or the default) is sent as a user message each time the loop continues. The agent never sees:
