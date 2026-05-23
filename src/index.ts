@@ -244,7 +244,7 @@ export const ChronoLoopPlugin: Plugin = async ({ client, directory, worktree }) 
       loops.set(sessionID, state)
       refreshHeartbeat()
 
-      // Toast confirmation
+      // Toast confirmation — loop is armed, will fire on next session.idle
       const totalFormatted = formatDuration(state.durationMs)
       await toast(
         `ChronoLoop started — ${op.minutes}m (${totalFormatted})`,
@@ -252,10 +252,9 @@ export const ChronoLoopPlugin: Plugin = async ({ client, directory, worktree }) 
         5000,
       )
 
-      // Fire the first continuation immediately
-      await fireContinuation(sessionID, state)
-
-      // Prevent the command from being processed further
+      // Do NOT fire the first continuation here. Wait for session.idle so the
+      // current agent turn (if any) can finish first. If the session is already
+      // idle, the handler below will pick it up.
       throw new Error(HANDLED)
     },
 

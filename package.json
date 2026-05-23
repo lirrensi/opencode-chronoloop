@@ -1,6 +1,6 @@
 {
   "name": "opencode-chronoloop",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "type": "module",
   "description": "Endless autonomous loop for OpenCode — time-based, no completion criteria",
   "main": "./src/index.ts",
