@@ -1,2 +1,6 @@
 allowBuilds:
   msgpackr-extract: true
+
+# Trusted packages — skip 24h release cooldown
+minimumReleaseAgeExclude:
+  - "@opencode-ai/*"
