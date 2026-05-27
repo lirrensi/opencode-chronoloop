@@ -1,44 +1,45 @@
 {
-  "name": "opencode-chronoloop",
-  "version": "0.3.0",
-  "type": "module",
-  "description": "Endless autonomous loop for OpenCode — time-based, no completion criteria",
-  "main": "./src/index.ts",
-  "keywords": [
-    "opencode",
-    "opencode-plugin",
-    "plugin",
-    "loop",
-    "autonomous",
-    "cronoloop",
-    "chonoloop"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lirrensi/opencode-chronoloop.git"
-  },
-  "license": "MIT",
-  "files": [
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "scripts": {
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "sync": "node scripts/sync-plugins.mjs"
-  },
-  "dependencies": {
-    "@opencode-ai/plugin": "^1.15.10",
-    "@opencode-ai/sdk": "^1.15.10"
-  },
-  "devDependencies": {
-    "@types/node": "^25.9.1",
-    "typescript": "^5.8.3",
-    "vitest": "^4.1.7"
-  }
+    "name": "opencode-chronoloop",
+    "version": "0.3.1",
+    "type": "module",
+    "description": "Endless autonomous loop for OpenCode — time-based, no completion criteria",
+    "main": "./src/index.ts",
+    "keywords": [
+        "opencode",
+        "opencode-plugin",
+        "plugin",
+        "loop",
+        "autonomous",
+        "cronoloop",
+        "chonoloop"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lirrensi/opencode-chronoloop.git"
+    },
+    "license": "MIT",
+    "files": [
+        "src",
+        "README.md",
+        "LICENSE"
+    ],
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "sync": "node scripts/sync-plugins.mjs",
+        "deploy": "node scripts/deploy.mjs"
+    },
+    "dependencies": {
+        "@opencode-ai/plugin": "^1.15.11",
+        "@opencode-ai/sdk": "^1.15.11"
+    },
+    "devDependencies": {
+        "@types/node": "^25.9.1",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.7"
+    }
 }

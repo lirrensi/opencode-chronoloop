@@ -3,9 +3,9 @@ import {
   formatDuration,
   formatRemaining,
   formatLoopSummary,
-} from "../src/core"
-import type { ChronoLoopState } from "../src/core"
+} from "../src/test-helpers"
 
+import type { ChronoLoopState } from "../src/test-helpers"
 describe("formatDuration", () => {
   test.each([
     [0, "0s"],
@@ -40,6 +40,7 @@ describe("formatLoopSummary", () => {
       durationMs: 120 * 60 * 1000, // 120 min
       message: "keep going",
       active: true,
+      dwellTimer: null,
     }
 
     const summary = formatLoopSummary(state)
@@ -56,6 +57,7 @@ describe("formatLoopSummary", () => {
       durationMs: 60 * 1000,
       message: "a".repeat(100),
       active: true,
+      dwellTimer: null,
     }
 
     const summary = formatLoopSummary(state)

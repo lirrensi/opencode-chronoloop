@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { parseChronoLoopCommand, DEFAULT_MESSAGE } from "../src/core"
+import { parseChronoLoopCommand, DEFAULT_MESSAGE } from "../src/test-helpers"
 
 describe("parseChronoLoopCommand", () => {
   test("empty input returns status", () => {

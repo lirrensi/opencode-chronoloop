@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { evaluateBackticks, MAX_BACKTICK_OUTPUT_LENGTH } from "../src/core"
+import { evaluateBackticks, MAX_BACKTICK_OUTPUT_LENGTH } from "../src/test-helpers"
 
 describe("evaluateBackticks", () => {
   test("no backticks passes through unchanged", () => {
