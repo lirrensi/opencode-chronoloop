@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process"
+import { execSync } from "child_process"
 
 export type ChronoLoopState = {
   startTime: number; durationMs: number; message: string; active: boolean

@@ -1,5 +1,5 @@
 import type { Plugin } from "@opencode-ai/plugin"
-import { execSync } from "node:child_process"
+import { execSync } from "child_process"
 
 // ═══════════════════════════════════════════
 //  ChronoLoop — copy this file to
@@ -111,9 +111,9 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
     },
     event: async ({ event }: any) => {
       const t = event.type, p = event.properties || event.data || {}
-      // DEBUG: show every event
-      if (t !== "message.updated" && t !== "session.status") {
-        toast(`[${t}]`, "info", 2000)
+      // DEBUG: show key events (skip noisy ones)
+      if (t === "session.idle" || t === "session.error" || t === "command.executed") {
+        toast(`[${t}]`, "info", 1500)
       }
       if (t === "message.updated") {
         if (p?.info?.role === "assistant") {
