@@ -62,24 +62,24 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
   let loop: LoopState | null = null
   let isIdle = false
   let inFlight = false
+  let dwellStartedAt = 0
   let hb: any = null
 
   const toast = (m: string, v = "info", d = 5000) =>
     client.tui.showToast({ body: { message: m, variant: v, duration: d } }).catch(() => {})
 
-  const cancelDwell = () => { if (loop?.dwellTimer) { clearTimeout(loop.dwellTimer); loop.dwellTimer = null } }
+  const cancelDwell = () => { if (loop?.dwellTimer) { clearTimeout(loop.dwellTimer); loop.dwellTimer = null; dwellStartedAt = 0 } }
 
   const startDwell = () => {
     if (!loop?.active) return
     const r = Math.max(0, loop.durationMs - (Date.now() - loop.startTime))
     if (r <= 0) { doStop(); toast(MSG_COMPLETED(Math.round(loop.durationMs / 60000)), "info", 8000); return }
-    toast(`DWELL started (${Math.round(r/1000)}s left)`, "info", 2000)
     cancelDwell()
+    dwellStartedAt = Date.now()
     loop.dwellTimer = setTimeout(() => {
-      loop!.dwellTimer = null
+      loop!.dwellTimer = null; dwellStartedAt = 0
       const r2 = Math.max(0, loop!.durationMs - (Date.now() - loop!.startTime))
       if (r2 <= 0) { doStop(); toast(MSG_COMPLETED(Math.round(loop!.durationMs / 60000)), "info", 8000); return }
-      toast("DWELL FIRED → sending", "info", 3000)
       fire()
     }, 30_000)
   }
@@ -99,8 +99,13 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
       hb = setInterval(() => {
         if (!loop?.active) return
         const r = Math.max(0, loop.durationMs - (Date.now() - loop.startTime))
-        if (r > 0) toast(`ChronoLoop — ${fmt(r)} remaining`, "info", 4000)
-      }, 30_000)
+        if (r <= 0) { doStop(); toast(MSG_COMPLETED(Math.round(loop.durationMs / 60000)), "info", 8000); return }
+        const dwellLeft = dwellStartedAt > 0 ? Math.round((30_000 - (Date.now() - dwellStartedAt)) / 1000) : 0
+        const status = dwellStartedAt > 0
+          ? `⏳ dwell ${dwellLeft}s → fire`
+          : isIdle ? "🟢 idle — waiting" : "🔴 active — waiting"
+        toast(`ChronoLoop ${fmt(r)} | ${status}`, "info", 4000)
+      }, 5_000)
     } else if (!loop?.active && hb) { clearInterval(hb); hb = null }
   }
 
@@ -111,22 +116,14 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
     },
     event: async ({ event }: any) => {
       const t = event.type, p = event.properties || event.data || {}
-      // DEBUG: show key events (skip noisy ones)
-      if (t === "session.idle" || t === "session.error" || t === "command.executed") {
-        toast(`[${t}]`, "info", 1500)
-      }
       if (t === "message.updated") {
         if (p?.info?.role === "assistant") {
-          toast("ACTIVITY — cancel dwell", "info", 1500)
           isIdle = false; cancelDwell()
           if (p?.info?.error?.name === "MessageAbortedError" && loop?.active) { doStop(); toast("ChronoLoop stopped after interrupt", "info") }
         }
         return
       }
-      if (t === "session.idle") {
-        toast("IDLE — start dwell", "info", 2000)
-        isIdle = true; inFlight = false; startDwell()
-      }
+      if (t === "session.idle") { isIdle = true; inFlight = false; startDwell() }
     },
     "command.execute.before": async (input: any) => {
       if (input.command !== "cronoloop") return
