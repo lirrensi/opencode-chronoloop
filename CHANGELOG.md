@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.1] — 2026-06-12
+
+### Fixed
+
+- **Mid-session firing** — loops no longer fire continuations when the user
+  switches to a new session mid-loop. The loop auto-stops on `session.created`.
+- **Dwell-based firing** — instead of firing immediately on every `session.idle`,
+  the loop now waits 30 seconds of continuous idle before sending the next
+  continuation. This prevents rapid-fire loops when the agent finishes quickly
+  and avoids firing during transient idle states.
+- **Heartbeat clarity** — toast now shows dwell/active/idle status alongside
+  remaining time, making it clearer what the loop is doing.
+
+### Changed
+
+- **Refactored core** — `src/core.ts` inlined into `src/index.ts`; test-only
+  utilities extracted to `src/test-helpers.ts` for a cleaner plugin boundary.
+- **Deploy script** — added `scripts/deploy.mjs` for single-file deployment
+  to `~/.config/opencode/plugins/` (strips test-only exports automatically).
+- **Dependencies** — `@opencode-ai/plugin` and `@opencode-ai/sdk` bumped to
+  `^1.15.11`, TypeScript to `^6.0.3`.
+
+---
+
 ## [0.2.1] — 2026-05-23
 
 ### Fixed
@@ -62,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plan-mode safe-skip (no infinite planning loops).
 - No tool exposed to agent — pure time-based exit, hidden from agent.
 
+[0.4.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.3.0...v0.4.1
 [0.2.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.1.0...v0.1.1
