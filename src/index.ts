@@ -2,9 +2,7 @@ import type { Plugin } from "@opencode-ai/plugin"
 import { execSync } from "child_process"
 
 // ═══════════════════════════════════════════
-//  ChronoLoop — copy this file to
-//  ~/.config/opencode/plugins/ to install.
-//  No build step. No deploy script.
+//  ChronoLoop — pnpm run deploy to install.
 // ═══════════════════════════════════════════
 
 // ── internal types ──
@@ -89,7 +87,8 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
     try {
       const msg = evalBackticks(loop.message)
       await client.tui.clearPrompt(); await client.tui.appendPrompt({ body: { text: msg } }); await client.tui.submitPrompt()
-    } catch (e: any) { inFlight = false; toast(`ChronoLoop fail: ${e.message}`, "error") }
+    } catch (e: any) { toast(`ChronoLoop fail: ${e.message}`, "error") }
+    finally { inFlight = false }
   }
 
   const doStop = () => { cancelDwell(); loop = null; inFlight = false; refreshHb() }
@@ -124,6 +123,12 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
         return
       }
       if (t === "session.idle") { isIdle = true; inFlight = false; startDwell() }
+      if (t === "session.created") {
+        if (loop?.active) {
+          const e = fmt(Date.now() - loop.startTime); doStop()
+          toast(`ChronoLoop auto-stopped (new session) — ran ${e}`, "info")
+        }
+      }
     },
     "command.execute.before": async (input: any) => {
       if (input.command !== "cronoloop") return
