@@ -7,16 +7,39 @@ export type ChronoLoopState = {
 
 export const DEFAULT_MESSAGE = "We are running in an autonomous loop. Continue working. Make progress, improve things. Do not stop — there is always more to do."
 
+/**
+ * Parse a duration string into milliseconds.
+ * Bare numbers = minutes (backward compat). Supports s/m/h suffixes.
+ * Returns null if the input doesn't match or is <= 0.
+ *
+ * Examples: "30"→1_800_000  "30m"→1_800_000  "1h"→3_600_000  "90s"→90_000
+ */
+export function parseDurationMs(raw: string): number | null {
+  const match = /^(\d+)([smh]?)$/i.exec(raw.trim())
+  if (!match) return null
+  const value = parseInt(match[1]!, 10)
+  if (value <= 0) return null
+  const unit = (match[2] || "m").toLowerCase()
+  switch (unit) {
+    case "s": return value * 1000
+    case "m": return value * 60_000
+    case "h": return value * 3_600_000
+    default: return null
+  }
+}
+
 export function parseChronoLoopCommand(input: string): { kind: "start"; minutes: number; message: string } | { kind: "stop" } | { kind: "status" } {
   const text = input.trim()
   if (!text) return { kind: "status" }
   if (text.toLowerCase() === "stop") return { kind: "stop" }
-  const match = /^(\d+)(?:\s+(.+))?$/s.exec(text)
-  if (!match || parseInt(match[1]!) <= 0) return { kind: "status" }
+  const match = /^(\d+[smh]?)(?:\s+(.+))?$/si.exec(text)
+  if (!match) return { kind: "status" }
+  const durMs = parseDurationMs(match[1]!)
+  if (durMs === null) return { kind: "status" }
   const raw = match[2]?.trim() ?? ""
   const msg = raw.length >= 2 && ((raw.startsWith('"')&&raw.endsWith('"'))||(raw.startsWith("'")&&raw.endsWith("'")))
     ? raw.slice(1,-1).trim() : raw
-  return { kind: "start", minutes: parseInt(match[1]!), message: msg || DEFAULT_MESSAGE }
+  return { kind: "start", minutes: Math.round(durMs / 60_000), message: msg || DEFAULT_MESSAGE }
 }
 
 export function formatDuration(ms: number): string {
@@ -38,6 +61,7 @@ export function formatLoopSummary(state: ChronoLoopState): string {
   ].join("\n")
 }
 
+export const BACKTICK_TIMEOUT_MS = 300_000
 export const MAX_BACKTICK_OUTPUT_LENGTH = 2_000
 
 export function evaluateBackticks(message: string): string {
@@ -45,7 +69,7 @@ export function evaluateBackticks(message: string): string {
     const cmd = rawCommand.trim()
     if (!cmd) return ""
     try {
-      const stdout = execSync(cmd, { encoding: "utf-8", timeout: 30_000, windowsHide: true, stdio: ["pipe","pipe","pipe"] }) as string
+      const stdout = execSync(cmd, { encoding: "utf-8", timeout: BACKTICK_TIMEOUT_MS, windowsHide: true, stdio: ["pipe","pipe","pipe"] }) as string
       const output = stdout.trim()
       if (!output) return "(no output)"
       if (output.length > MAX_BACKTICK_OUTPUT_LENGTH) {
