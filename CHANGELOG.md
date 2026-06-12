@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.1] — 2026-06-13
+
+### Changed
+
+- **Standardized idle-aware fire behavior** — two-mode true-idle verification:
+  - **Already idle** when armed → short 3s dwell to confirm true idle → fire
+  - **Busy** when armed → wait for `session.idle`, then 10s dwell to confirm true idle → fire
+  - **Never injects during active agent cycles** — dwell timer is cancelled by any
+    `message.updated` (assistant), ensuring zero interruptions of ongoing work.
+  - Heartbeat toast now uses dynamic dwell countdown instead of hardcoded 30s.
+- **Dwell reduced** from 30s to 10s for standard follow-up fires.
+- **Command name fixed**: `/cronoloop` → `/chronoloop` (was missing the 'h').
+
+### Fixed
+
+- All README, CHANGELOG, and package.json references corrected from `cronoloop`
+  to `chronoloop`.
+
+---
+
 ## [0.4.1] — 2026-06-12
 
 ### Fixed
@@ -86,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plan-mode safe-skip (no infinite planning loops).
 - No tool exposed to agent — pure time-based exit, hidden from agent.
 
+[0.5.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.4.1...v0.5.1
 [0.4.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.3.0...v0.4.1
 [0.2.1]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/lirrensi/opencode-chronoloop/compare/v0.1.1...v0.2.0
