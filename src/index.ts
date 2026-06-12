@@ -105,7 +105,7 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
     const fire = async () => {
         if (inFlight || !loop) return; inFlight = true
         try {
-            const msg = evalBackticks(loop.message)
+            const msg = `[ChronoLoop active — continuation]\n\n${evalBackticks(loop.message)}`
             await client.tui.clearPrompt(); await client.tui.appendPrompt({ body: { text: msg } }); await client.tui.submitPrompt()
         } catch (e: any) { toast(`ChronoLoop fail: ${e.message}`, "error") }
         finally { inFlight = false }
