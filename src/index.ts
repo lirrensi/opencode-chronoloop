@@ -17,10 +17,10 @@ type LoopState = {
 const BACKTICK_TIMEOUT_MS = 300_000
 
 const DEFAULT_COMMAND_DESCRIPTION = "start or manage an endless autonomous loop — supports 30, 30m, 1h, 90s"
-const NO_LOOP = "No active cronoloop.\nUsage: /cronoloop <duration> [message]  (bare=mins, 30m, 1h, 90s)"
+const NO_LOOP = "No active chronoloop.\nUsage: /chronoloop <duration> [message]  (bare=mins, 30m, 1h, 90s)"
 const MSG_STOPPED = "ChronoLoop stopped."
 const MSG_COMPLETED = (m: number) => `ChronoLoop completed — ran for ${m} minute${m === 1 ? "" : "s"}.`
-const MSG_NO_LOOP_TO_STOP = "No active cronoloop to stop."
+const MSG_NO_LOOP_TO_STOP = "No active chronoloop to stop."
 
 function parseDurationMs(raw: string): number | null {
     const m = /^(\d+)([smh]?)$/i.exec(raw.trim())
@@ -127,7 +127,7 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
     return {
         config: async (cfg: any) => {
             cfg.command ??= {}
-            cfg.command.cronoloop = { template: "<duration> [message]", description: DEFAULT_COMMAND_DESCRIPTION }
+            cfg.command.chronoloop = { template: "<duration> [message]", description: DEFAULT_COMMAND_DESCRIPTION }
         },
         event: async ({ event }: any) => {
             const t = event.type, p = event.properties || event.data || {}
@@ -147,7 +147,7 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
             }
         },
         "command.execute.before": async (input: any) => {
-            if (input.command !== "cronoloop") return
+            if (input.command !== "chronoloop") return
             const DONE = "__CHL__"
             const op = parseCommand((input.arguments ?? "").trim())
             if (op.kind === "status") {
@@ -159,7 +159,7 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
                 const e = fmt(Date.now() - loop.startTime); doStop()
                 toast(`${MSG_STOPPED} Elapsed: ${e}`); throw new Error(DONE)
             }
-            if (loop?.active) { toast(`Already running. ${fmtRemaining(Date.now() - loop.startTime, loop.durationMs)} remaining. /cronoloop stop first.`, "error"); throw new Error(DONE) }
+            if (loop?.active) { toast(`Already running. ${fmtRemaining(Date.now() - loop.startTime, loop.durationMs)} remaining. /chronoloop stop first.`, "error"); throw new Error(DONE) }
             loop = { startTime: Date.now(), durationMs: op.minutes * 60_000, message: op.message, active: true, dwellTimer: null }
             refreshHb()
             toast(`ChronoLoop armed — fires after 30s of idle (${fmt(op.minutes * 60_000)})`, "info", 5000)

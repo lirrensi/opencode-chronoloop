@@ -115,24 +115,24 @@ No plugin can know which one you're doing or what "progress" means in your conte
 
 ## Commands 🚀🎉🎮🕹️🎯
 
-### `/cronoloop <minutes> [message]` 🎬🎥🎞️📽️
+### `/chronoloop <minutes> [message]` 🎬🎥🎞️📽️
 
 Start an endless loop for the given number of minutes.
 
 ```
-/cronoloop 120
-/cronoloop 60 "Keep working on the backlog. Check TODO.md for next priorities."
+/chronoloop 120
+/chronoloop 60 "Keep working on the backlog. Check TODO.md for next priorities."
 ```
 
 If no message is provided, the default is used:
 
 > *We are running in an autonomous loop. Continue working. Make progress, improve things. Do not stop — there is always more to do.* 🔄♾️🌀💫
 
-### `/cronoloop` 👀👁️🧐🔍
+### `/chronoloop` 👀👁️🧐🔍
 
 Show current loop status — elapsed time and remaining.
 
-### `/cronoloop stop` 🛑⛔🚫🚷
+### `/chronoloop stop` 🛑⛔🚫🚷
 
 Stop the loop immediately.
 
@@ -149,9 +149,9 @@ status report.
 stdout replaces the backtick segment inline.
 
 ```
-/cronoloop 120 "Check `git log --oneline -3` then continue working"
-/cronoloop 30 "`pnpm test --reporter=dot 2>&1 | tail -5` — fix any failures"
-/cronoloop 60 "Read CHRONO_CONTEXT.md. Current time: `date /t`"
+/chronoloop 120 "Check `git log --oneline -3` then continue working"
+/chronoloop 30 "`pnpm test --reporter=dot 2>&1 | tail -5` — fix any failures"
+/chronoloop 60 "Read CHRONO_CONTEXT.md. Current time: `date /t`"
 ```
 
 **Safety & limits:**
@@ -189,7 +189,7 @@ How does ChronoLoop stay invisible to the agent? It operates at the **TUI layer*
                   │            OpenCode TUI                  │
                   │                                          │
                   │  ┌──────────────────────────────────┐    │
-                  │  │  You: /cronoloop 60               │    │
+                  │  │  You: /chronoloop 60               │    │
                   │  │  Agent: *works on your project*   │    │
                   │  │  ── session.idle fires ────────── │    │
                   │  │  ChronoLoop: *types message*      │    │
@@ -245,7 +245,7 @@ This is the most important architectural distinction between ChronoLoop and patt
 
 - **Don't ask the agent to spawn sub-agents within the session.** Telling the agent to "create a sub-agent to handle testing" sounds clever but bloats the context with nested tool calls, internal monologue, and half-finished sub-tasks. Instead, use the **session strategy** (Best Practice #7) — separate loops in separate sessions communicate through files.
 
-- **Shorter loops = more compaction.** A 15-minute loop compacts more frequently than an 8-hour one. If you're seeing context bloat degrade the agent's performance, try reducing the duration. Each new `/cronoloop` call starts a fresh session, so breaking work into shorter sequential loops gives the agent a cleaner slate more often.
+- **Shorter loops = more compaction.** A 15-minute loop compacts more frequently than an 8-hour one. If you're seeing context bloat degrade the agent's performance, try reducing the duration. Each new `/chronoloop` call starts a fresh session, so breaking work into shorter sequential loops gives the agent a cleaner slate more often.
 
 - **The scratchpad is essential.** Because the session stays alive, the agent might *think* it remembers something from 40 turns ago (when compaction hasn't cleared it yet). But it can't *rely* on that memory — compaction could wipe it at any moment. The scratchpad file (or backtick-injected state) is the only reliable source of truth.
 
@@ -313,7 +313,7 @@ For fast models, start small (15–30 minutes), observe the quality, and scale u
 **Plan first, loop later.** Before you commit to a 6-hour run, spend the first 10–15 minutes on a short **planning loop**:
 
 ```
-/cronoloop 15 "Explore the codebase. Identify the top 5 areas that need work.
+/chronoloop 15 "Explore the codebase. Identify the top 5 areas that need work.
                Write them to PLAN.md with priority order and estimated effort.
                Do NOT make any changes — just plan."
 ```
@@ -333,7 +333,7 @@ ChronoLoop fires the same message every time. If the agent has no memory of what
 Your message should point to this mechanism:
 
 ```
-/cronoloop 60 "Read CHRONO_CONTEXT.md and continue from where you left off. Update the file with progress when you complete something."
+/chronoloop 60 "Read CHRONO_CONTEXT.md and continue from where you left off. Update the file with progress when you complete something."
 ```
 
 **Assume compaction happens.** The chat history will be cleared at some point — by context limits, by OpenCode trimming, or by a session restart. Your scratchpad file is the source of truth, not the conversation. Design for it.
@@ -389,8 +389,8 @@ You have two strategies:
 The evaluator doesn't need to be a different model — just a different session with a different prompt that emphasizes skepticism:
 
 ```
-Session A (doer):  /cronoloop 60 "Implement the feature. Write tests."
-Session B (judge): /cronoloop 15 "Review the output from Session A's scratchpad.
+Session A (doer):  /chronoloop 60 "Implement the feature. Write tests."
+Session B (judge): /chronoloop 15 "Review the output from Session A's scratchpad.
                     Look for edge cases, regressions, and quality gaps.
                     Be harsh. File issues in REVIEW.md."
 ```
@@ -474,7 +474,7 @@ Think of backtick commands as **sensory organs** for your agent:
 
 ```
 # The message reads the scratchpad, checks progress, and feeds it all back
-/cronoloop 60 "Read `cat CHRONO_CONTEXT.md`. 
+/chronoloop 60 "Read `cat CHRONO_CONTEXT.md`. 
   Check recent work: `git log --oneline -3 --format='- %s'`.
   Run tests: `pnpm test 2>&1 | tail -5`.
   Continue from where you left off. Update CHRONO_CONTEXT.md when done."
@@ -494,10 +494,10 @@ This creates a loop where the agent:
 Since loops are scoped per-session (each conversation gets its own independent loop), you can run multiple specialized loops **concurrently** in different sessions:
 
 ```
-Session A:  /cronoloop 60  "Refactor the codebase. Focus on code quality."
-Session B:  /cronoloop 60  "Write and fix tests. Run pnpm test after each change."
-Session C:  /cronoloop 30  "Review docs. Fix any outdated documentation."
-Session D:  /cronoloop 120 "Background: check deps, update packages, audit security."
+Session A:  /chronoloop 60  "Refactor the codebase. Focus on code quality."
+Session B:  /chronoloop 60  "Write and fix tests. Run pnpm test after each change."
+Session C:  /chronoloop 30  "Review docs. Fix any outdated documentation."
+Session D:  /chronoloop 120 "Background: check deps, update packages, audit security."
 ```
 
 Each session has its own:

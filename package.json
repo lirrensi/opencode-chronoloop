@@ -10,7 +10,7 @@
         "plugin",
         "loop",
         "autonomous",
-        "cronoloop",
+        "chronoloop",
         "chonoloop"
     ],
     "repository": {

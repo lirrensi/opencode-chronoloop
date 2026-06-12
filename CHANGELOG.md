@@ -78,8 +78,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release: endless autonomous loop plugin for OpenCode.
 - Time-based loop with configurable duration and custom message.
-- `/cronoloop <minutes> [message]` command to start a loop.
-- `/cronoloop` (status) and `/cronoloop stop` commands.
+- `/chronoloop <minutes> [message]` command to start a loop.
+- `/chronoloop` (status) and `/chronoloop stop` commands.
 - Heartbeat toast every 30 seconds showing remaining time.
 - Session-scoped loops (one per session).
 - In-flight detection and abort-on-interrupt handling.
