@@ -121,12 +121,14 @@ Start an endless loop for the given number of minutes.
 
 ```
 /chronoloop 120
-/chronoloop 60 "Keep working on the backlog. Check TODO.md for next priorities."
+/chronoloop 60 "You are in a continuous autonomous loop for 1 hour. Read PLAN.md, pick the next priority, and make progress. Update PLAN.md when done."
 ```
 
 If no message is provided, the default is used:
 
 > *We are running in an autonomous loop. Continue working. Make progress, improve things. Do not stop — there is always more to do.* 🔄♾️🌀💫
+
+**The message is your only interface.** The agent won't know it's in a loop unless you tell it. See [Crafting your loop message](#-crafting-your-loop-message) below.
 
 ### `/chronoloop` 👀👁️🧐🔍
 
@@ -170,15 +172,108 @@ adapt to changing conditions, and bring fresh context each loop.
 
 ## What the agent sees 👁️💎👀🧠🔮
 
-Your message (or the default) is sent as a user message each time the loop continues. The agent never sees:
+Your message is sent exactly as-is each time the loop fires. The agent sees:
 
-- How much time is left
-- That there's a time limit at all
-- Any completion criteria or exit condition
+- **Everything you put in the message** — nothing more, nothing less
+- It does **not** know the time limit, remaining time, or that ChronoLoop exists
 
-It just sees "continue working" and keeps going. This prevents shortcut behavior, sleeping, or premature wrap-ups. 🙈🚫⛔🛑
+**This means you must tell the agent it's in a loop.** Unlike PowerGoal or other task-oriented patterns — where the agent has a tool to declare completion — ChronoLoop is a blind timer. The agent has no way to detect the loop, no escape hatch, and no indication that it will keep getting the same message unless you explicitly include that context.
+
+A good loop message always answers these questions:
+
+| Question | Example |
+|---|---|
+| What is happening? | "You are in a continuous autonomous loop running for the next 2 hours." |
+| What to do? | "Read PROGRESS.md, continue from where you left off, and make progress on the priority list." |
+| What happens next? | "You will receive this message again after each response. This will repeat until the session ends." |
+| How to handle being stuck? | "If blocked, document in BLOCKERS.md and pivot to the next item." |
+| Where to persist state? | "Update PROGRESS.md after each action so you can resume next iteration." |
+
+Without this context, the agent treats each fire as a fresh instruction — no continuation awareness, no scratchpad, no self-correction. It will repeat the same work or stop prematurely.
+
+> ⚡ **The cardinal rule:** *Tell the agent what kind of loop it's in.* ChronoLoop's fire is the agent's only source of truth about the loop. Use it. 🎯💎
 
 ---
+
+## Crafting your loop message 🎯📝🧠💬⚡
+
+Your message is the agent's context for every fire. ChronoLoop fires are *continuations* — the same session, the same project, the same work. The agent needs to know that and act accordingly.
+
+### Pattern: Long-running autonomous work (6+ hours)
+
+For overnight or whole-day runs where you want continuous progress across many turns:
+
+```
+/chronoloop 360 "⚠️ You are in a continuous autonomous loop for 6 hours.
+You will keep receiving this message — do not stop.
+- Read CHRONO_CONTEXT.md to see what was done last iteration
+- Continue the work in progress
+- Update CHRONO_CONTEXT.md after each significant action
+- If blocked or stuck for 3 attempts, document in BLOCKERS.md and pivot
+- When truly out of work, run a fresh audit and define the next cycle"
+```
+
+The agent needs:
+- **Session awareness** — "you will keep receiving this message" explains the repetition
+- **State persistence** — a scratchpad file it reads and writes each iteration
+- **Blockers handling** — what to do when stuck (it can't raise its hand)
+- **Fallback work** — what to do when everything is done
+
+### Pattern: Focused refactoring session (30–60 min)
+
+For focused work on a specific area:
+
+```
+/chronoloop 45 "You are in an autonomous loop for the next 45 minutes.
+Focus area: refactoring the auth module.
+- Check TODO.md for the next auth refactor item
+- Make the change
+- Run `pnpm test` to verify nothing broke
+- Update TODO.md with progress
+- If tests fail, fix them before moving on
+- Keep going until the session ends"
+```
+
+### Pattern: Exploration and discovery
+
+When you want the agent to learn the codebase and plan improvements:
+
+```
+/chronoloop 60 "Autonomous loop — 1 hour.
+Your job is to explore and document. Do NOT make changes yet.
+- Scan the codebase for the 5 most impactful improvements
+- Write findings to DISCOVERY.md with effort estimates
+- After each area, check git log for context
+- If you finish early, dig deeper into any area that needs it"
+```
+
+### Pattern: Simple endless keep-going
+
+When you trust the agent and just want it to keep moving:
+
+```
+/chronoloop 120 "Continue working autonomously.
+Read `cat CHRONO_CONTEXT.md`. Resume from where you left off.
+Update the scratchpad when done."
+```
+
+### What NOT to do
+
+```
+/chronoloop 60 "Fix the login bug"  ← agent fixes it once, thinks it's done
+/chronoloop 120 "Keep working"      ← on what? agent doesn't know the context
+/chronoloop 999 ""                  ← no message = default, which agent can't see
+```
+
+Without loop awareness in your message, the agent:
+- Fixes one thing, declares victory, waits
+- Repeats the same work each fire
+- Never uses scratchpads or persistence
+- Treats each fire as a fresh task rather than a continuation
+
+---
+
+## Architecture 🔮🧬⚙️🎛️🔧
 
 ## Architecture 🔮🧬⚙️🎛️🔧
 
