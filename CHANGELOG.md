@@ -2,8 +2,29 @@
 
 All notable changes to **opencode-chronoloop** are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.1/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v0.2.0.html).
+
+---
+
+## [0.5.2] — 2026-06-24
+
+### Fixed
+
+- **No more `__CHL__` error spam in chat.** The `command.execute.before` hook
+  previously used `throw new Error("__CHL__")` as a control-flow trick to
+  abort the `/chronoloop` command. This was never a documented opencode plugin
+  pattern — it only worked because older opencode silently swallowed plugin
+  errors. The June 9, 2026 opencode refactor (commits `07e5ea93` and
+  `600e405b`) restored error logging, so every throw now surfaces as a visible
+  `session.error` event with a full stack trace in the chat.
+- **Hook now uses the SDK's documented mutator contract.** Clears
+  `output.parts` in place and returns normally instead of throwing. No error
+  propagation, no chat spam.
+- **Flattened nested `if`/`throw` chains** into clean `if`/`else if`/`else`
+  blocks across `status`/`stop`/`start` subcommands. The dwell timer setup is
+  now only triggered on the actual start path, not on the "already running"
+  early-out.
 
 ---
 
