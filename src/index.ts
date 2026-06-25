@@ -167,8 +167,8 @@ export const ChronoLoopPlugin: Plugin = async ({ client }: any) => {
             loop = { startTime: Date.now(), durationMs: op.minutes * 60_000, message: op.message, active: true, dwellTimer: null }
             refreshHb()
             toast(`ChronoLoop armed — fires after idle (${fmt(op.minutes * 60_000)})`, "info", 5000)
-            if (isIdle) { startDwell(SHORT_DWELL_MS) }
-            // not idle → no startDwell; session.idle will trigger startDwell(DWELL_MS)
+            // Always arm the dwell — session.idle may never fire after throw.
+            startDwell(isIdle ? SHORT_DWELL_MS : DWELL_MS)
             throw new Error(DONE)
         },
     }
